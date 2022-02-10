@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import express from 'express';
+
 import { User } from '../models/User';
 import { getConnection } from 'typeorm';
 
@@ -9,7 +9,7 @@ interface user {
     email: string,
     password: string
 }
-interface UserDTO{
+interface UserDTO {
     id: number,
     name: string,
     email: string,
@@ -22,6 +22,10 @@ const getAllUsers = async (req: Request, res: Response) => {
     })
 
 };
+const localGetAllUsers = async (): Promise<User[]> => {
+    const users: User[] = await User.find();
+    return users;
+}
 
 const createUser = async (req: Request, res: Response) => {
     const temp: user = req.body
@@ -39,17 +43,18 @@ const deleteUser = async (req: Request, res: Response) => {
     res.status(200).end();
 }
 
-const updateUser =async (req: Request, res: Response) => {
+const updateUser = async (req: Request, res: Response) => {
     const userDTO: UserDTO = req.body;
-    await getConnection().createQueryBuilder().update(User).set({name: userDTO.name, email:userDTO.email, password: userDTO.password}).where("id = :id", { id: userDTO.id }).execute();
+    await getConnection().createQueryBuilder().update(User).set({ name: userDTO.name, email: userDTO.email, password: userDTO.password }).where("id = :id", { id: userDTO.id }).execute();
     res.status(200).end();
 }
 
 
 
 module.exports = {
-        createUser,
-        getAllUsers,
-        deleteUser,
-        updateUser
+    createUser,
+    getAllUsers,
+    deleteUser,
+    updateUser,
+    localGetAllUsers
 }

@@ -1,6 +1,6 @@
 import { type } from "os";
 import dotenv from "dotenv";
-const { getAllStocks,localUpdateStock } = require('../controllers/StockController')
+const { getAllStocks, localUpdateStock } = require('../controllers/StockController')
 const axios = require('axios').default;
 dotenv.config();
 
@@ -22,18 +22,17 @@ const updateAllQuotes = async () => {
     const stockList: Stock[] = await getAllStocks();
     const updatedStockList: Stock[] = [];
 
-    for(const stock of stockList){
+    for (const stock of stockList) {
         try {
             const resp = await axios.get(`https://yfapi.net/v6/finance/quote?region=${'ca'}&lang=en&symbols=${stock.symbol}`, options);
             const data = resp.data.quoteResponse.result[0];
-            updatedStockList.push({ symbol: stock.symbol, company: data.shortName,previousPrice: stock.currentPrice, currentPrice: data.bid });
+            updatedStockList.push({ symbol: stock.symbol, company: data.shortName, previousPrice: stock.currentPrice, currentPrice: data.bid });
         } catch (err) {
             console.log(err);
         }
     }
 
-    localUpdateStock(updatedStockList);
-    
+    await localUpdateStock(updatedStockList);
 }
 
 

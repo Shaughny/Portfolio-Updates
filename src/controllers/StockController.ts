@@ -25,7 +25,7 @@ const addStock = async (req: Request, res: Response) => {
             Stock.insert(stockDTO);
         }
         await getConnection().createQueryBuilder()
-            .relation(User, "stocks").of(userDTO).add(stockDTO);
+            .relation(User, "stocks").of(userDTO).add(stockExists);
 
 
         res.status(200).end();
@@ -36,11 +36,9 @@ const addStock = async (req: Request, res: Response) => {
 }
 
 const getAllStocks = async () => {
-
-    const stocks = await Stock.find();
+  
+    const stocks: Stock[] = await getConnection().manager.find(Stock);
     return stocks;
-    // return JSON.stringify(stocks);
-
 }
 
 const stocksByUser = async (req: Request, res: Response) => {
@@ -56,9 +54,22 @@ const stocksByUser = async (req: Request, res: Response) => {
     }
 
 }
+
+const localStocksByUser =async (user:User):Promise<Stock[]> => {
+    let stocks:Stock[];
+    if (user) {
+        stocks = await getConnection().createQueryBuilder().relation(User, 'stocks')
+            .of(user.id).loadMany();
+        return stocks;
+    }
+    else {
+        throw new Error("Invalid User Exception");
+    }
+}
+
 const updateStock = async (req: Request, res: Response) => {
-    const stockDTO: stock[] = req.body.stocks;
-    stockDTO.forEach(async stock => {
+    const stocks: stock[] = req.body.stocks;
+    stocks.forEach(async stock => {
 
         await getConnection().createQueryBuilder().update(Stock).set(stock).where("symbol = :id", { id: stock.symbol }).execute();
     })
@@ -66,23 +77,23 @@ const updateStock = async (req: Request, res: Response) => {
 
     res.status(200).end();
 }
-const localUpdateStock = async (data:stock[]) => {
-    const stockDTO: stock[] = data;
-    stockDTO.forEach(async stock => {
+const localUpdateStock = async (data: stock[]) => {
+    const stocks: stock[] = data;
+    stocks.forEach(async stock => {
 
         await getConnection().createQueryBuilder().update(Stock).set(stock).where("symbol = :id", { id: stock.symbol }).execute();
     })
 }
 const deleteStock = async (req: Request, res: Response) => {
     const userId = parseInt(req.body.user);
-    const stockSymbol = req.body.stock;
+    const symbol = req.body.stock;
     const user = await getConnection().manager.findOne(User, userId);
     if (user) {
         await getConnection().createQueryBuilder()
-            .relation(User, "stocks").of(userId).remove(stockSymbol);
-        const stocks = await getConnection().createQueryBuilder().relation(Stock, "user").of(stockSymbol).loadMany()
+            .relation(User, "stocks").of(userId).remove(symbol);
+        const stocks = await getConnection().createQueryBuilder().relation(Stock, "user").of(symbol).loadMany()
         if (stocks.length === 0) {
-            await getConnection().manager.delete(Stock, stockSymbol);
+            await getConnection().manager.delete(Stock, symbol);
         }
         res.json(stocks).end();
     }
@@ -94,5 +105,6 @@ module.exports = {
     deleteStock,
     updateStock,
     getAllStocks,
-    localUpdateStock
+    localUpdateStock,
+    localStocksByUser
 }

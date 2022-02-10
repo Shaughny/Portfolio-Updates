@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, BaseEntity, PrimaryColumn, ManyToMany, JoinTable } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn, BaseEntity, PrimaryColumn, ManyToMany} from "typeorm";
 import { User } from "./User";
 
 
@@ -12,10 +12,10 @@ export class Stock extends BaseEntity {
     @Column()
     company!: string;
 
-    @Column("decimal",{ precision: 6, scale: 2})
+    @Column("decimal",{ precision: 6, scale: 2,default: 0.00})
     previousPrice!: number;
 
-    @Column("decimal", { precision: 6, scale: 2 })
+    @Column("decimal", { precision: 6, scale: 2 ,default: 0.00})
     currentPrice!: number;
     
     @ManyToMany(() => User, user => user.stocks)
