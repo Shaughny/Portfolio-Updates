@@ -11,14 +11,15 @@ const {updatePortfolios} = require('./services/PortfolioService');
 const app = express();
 app.use(express.json());
 
+//Call to asynchronous function to connect the database
 db();
 
-
+//route endpoints for different uses
 app.use('/users',userRoutes);
 app.use('/stocks',stockRoutes);
 
 
-
+//schedule the API to generate new Data and update users at a specific time
 cron.schedule('* * * * *', updatePortfolios);
 
 app.listen(SERVER.port, () => {
