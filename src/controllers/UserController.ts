@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 
 import { User } from '../models/User';
 import { getConnection } from 'typeorm';
-
+const { body, validationResult } = require('express-validator');
 
 interface user {
     name: string,
@@ -22,12 +22,17 @@ const getAllUsers = async (req: Request, res: Response) => {
     })
 
 };
+
 const localGetAllUsers = async (): Promise<User[]> => {
     const users: User[] = await User.find();
     return users;
 }
 
 const createUser = async (req: Request, res: Response) => {
+    const errors = validationResult(req);
+    if(!errors.isEmpty()){
+        return res.status(400).json({errors: errors.array()})
+    }
     const temp: user = req.body
     User.insert({
         name: temp.name,

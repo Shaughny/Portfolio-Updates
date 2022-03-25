@@ -6,10 +6,9 @@ const {updateAllQuotes} = require('../services/StockDetails');
 const {sendEmails} = require('../services/EmailService');
 
 
+
 const updatePortfolios = async () => {
     await updateAllQuotes();
-
-
 
     const userList: User[] = await localGetAllUsers();
 
@@ -23,7 +22,7 @@ const updatePortfolios = async () => {
                 const percentageChange = Math.round((1.00 - (stock.previousPrice/stock.currentPrice))* 100)
                 const operator = (stock.currentPrice - stock.previousPrice > 0) ? '+' : '';
                 const colorStyle = (stock.currentPrice - stock.previousPrice > 0) ? '\"color: #4CBB17;\"' : '\"color: #FF3131;\"';
-                htmlString += `<h3 style="color: #FFA500; "><em>${stockName} : &emsp;</em></h3><p>Market Close:&emsp;</p><p style=${colorStyle}>${stock.currentPrice}</p>\n<p>24h Change: &emsp;</p>    <p style=${colorStyle}>${operator}${percentageChange}%</p> `
+                htmlString += `<hr/><h3 style="color: black; "><em>${stockName} : &emsp;</em></h3><p>Market Close:&emsp;</p><p style=${colorStyle}>${stock.currentPrice}</p>\n<p>24h Change: &emsp;</p>    <p style=${colorStyle}>${operator}${percentageChange}%</p></hr>`
 
             }
             await sendEmails(user.name,htmlString,user.email);
