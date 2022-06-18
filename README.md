@@ -1,3 +1,4 @@
-# Portfolio-Updates
+## Portfolio-Updates API & Notification system
 
-REST API saving,updating and creating users/portfolios that will automatically generate an E-Mail update for each user at market close of each business day. 
+- API for handling saving, updating, creating users and portfolios that will generate an E-Mail for each user with their selected portfolio
+- <ins>Used:</ins> **Nodejs, Typescript, Express**
